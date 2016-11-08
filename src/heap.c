@@ -1,4 +1,5 @@
 #include <refuse/heap.h>
+<<<<<<< HEAD
 #include <stdint.h>
 
 typedef struct _refuse_heap_block{
@@ -99,10 +100,39 @@ compact(refuse_heap* heap){
       this = this->next;
     }
   }
+=======
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+
+typedef unsigned char byte;
+
+struct _refuse_heap{
+  void* start;
+  void* current;
+  size_t size;
+};
+
+refuse_heap*
+refuse_heap_new(size_t max_size){
+  refuse_heap* heap = malloc(sizeof(refuse_heap));
+  heap->start = heap->current = malloc(max_size);
+  heap->size = max_size;
+  return heap;
+}
+
+#define HEAP_SIZE(Heap) ((Heap)->current - (Heap)->start)
+#define CHUNK_SIZE(Chunk) (*((size_t*)(Chunk)))
+
+size_t
+refuse_heap_size(refuse_heap* heap){
+  return HEAP_SIZE(heap);
+>>>>>>> 5e7d205a1b0b6a9f2042f18b7d574dcef12d3db9
 }
 
 void*
 refuse_heap_alloc(refuse_heap* heap, size_t size){
+<<<<<<< HEAD
   size += sizeof(refuse_heap_block);
   if(heap != NULL && (size >= 0 && size <= heap->size)){
     size_t sorted = 0x0;
@@ -179,4 +209,23 @@ refuse_heap_free(refuse_heap* heap, void* ptr){
     heap->unallocated = block;
     memset(block->ptr, 0, block->size);
   }
+=======
+  size += sizeof(size_t);
+  if((HEAP_SIZE(heap) + size) >= heap->size) return NULL;
+  void* chunk = heap->current;
+  heap->current += size;
+  CHUNK_SIZE(chunk) = size;
+  chunk += sizeof(size_t);
+  memset(chunk, 0, size);
+  return chunk;
+>>>>>>> 5e7d205a1b0b6a9f2042f18b7d574dcef12d3db9
+}
+
+void
+refuse_heap_free(refuse_heap* heap, void* ptr){
+  if(!((ptr >= heap->start) && (ptr <= (heap->start + heap->size)))) return;
+  size_t size = CHUNK_SIZE(ptr - sizeof(size_t));
+  printf("Freeing chunk of size: %li\n", size);
+  memset(ptr, 0, size);
+  CHUNK_SIZE(ptr) = 0x0;
 }

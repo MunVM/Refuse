@@ -20,4 +20,4 @@ void refuse_heap_free(refuse_heap* heap, void* ptr);
 
 void* refuse_heap_alloc(refuse_heap* heap, size_t size);
 
-#endif // REFUSE_HEAP_H
+iendif // REFUSE_HEAP_H
